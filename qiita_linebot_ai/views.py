@@ -3,6 +3,8 @@ from django.http import HttpResponse
 import json
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
+from django.urls import reverse
+from qiita_linebot_ai.models import User
 import urllib.request
 import json
 import ast
@@ -33,19 +35,25 @@ def index(request):
         for event in events:
             message = event['message']
             reply_token = event['replyToken']
+            user_id = event['source']['userId']
             if message['text'] == 'login':
-                if 'qiita_access_token' not in request.session:
-                    state = random.randint(1,100000)
-                    request.session['qiita_state'] = state
-                    print(request.session['qiita_state'])
-                    oauth_message = '以下のURLからQiita認証&LINE連携を行なってください！\n' + QIITA_OAUTH_URL + '?client_id=' + QIITA_CLIENT_ID + '&state=' + str(state) + 'scope=read_qiita+write_qiita'
-                    line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
-                    line_message.reply(reply_token)
-                else:
+                try:
+                    user = User.objects.get(pk=user_id)
                     message = 'すでにログイン済みです！'
                     line_message = LineMessage(message_creater.create_single_text_message(message))
                     line_message.reply(reply_token)
+                except User.DoesNotExist:
+                    oauth_message = '以下のURLからQiita認証を行なってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                    line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
+                    line_message.reply(reply_token)
         return HttpResponse("ok")
+
+def login(request, user_id):
+    if request.method == 'GET':
+        state = random.randint(1,100000)
+        request.session['qiita_state'] = state
+        request.session['line_user_id'] = user_id
+        return redirect(QIITA_OAUTH_URL + '?client_id=' + QIITA_CLIENT_ID + '&state=' + str(state) + '&scope=read_qiita+write_qiita')
 
 @csrf_exempt
 def qiita_oauth(request):
@@ -66,11 +74,13 @@ def qiita_oauth(request):
                 try:
                     with urllib.request.urlopen(req) as res:
                         body = res.read().decode("utf-8")
-                        request.session['qiita_access_token'] = ast.literal_eval(body)['token']
-                        state = random.randint(1,100000)
-                        request.session['line_state'] = state
-                        line_oauth_url = LINE_OAUTH_URL + '?response_type=code&client_id=' + LINE_CHANNEL_ID + '&redirect_uri=' + LINE_REDIRECT_URL + '&state=' + str(state)
-                        return redirect(line_oauth_url)
+                        user = User(qiita_access_token=ast.literal_eval(body)['token'], line_user_id=request.session['line_user_id'])
+                        user.save()
+                        #state = random.randint(1,100000)
+                        #request.session['line_state'] = state
+                        #line_oauth_url = LINE_OAUTH_URL + '?response_type=code&client_id=' + LINE_CHANNEL_ID + '&redirect_uri=' + LINE_REDIRECT_URL + '&state=' + str(state)
+                        #return redirect(line_oauth_url)
+                        return redirect(LINE_GROUP_URL)
                 except urllib.error.HTTPError as err:
                     print(err)
                     return redirect(LINE_GROUP_URL)
