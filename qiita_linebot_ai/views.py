@@ -10,7 +10,7 @@ import json
 import ast
 import random
 
-from utils import message_creater
+from utils import message_creater, qiita_tools
 from qiita_linebot_ai.line_message import LineMessage
 
 QIITA_OAUTH_URL = 'https://qiita.com/api/v2/oauth/authorize'
@@ -33,9 +33,23 @@ def index(request):
         line_request = json.loads(request.body.decode('utf-8'))
         events = line_request['events']
         for event in events:
-            message = event['message']
             reply_token = event['replyToken']
+            #Postback
+            if 'postback' in event:
+                postback_data = event['postback']['data'].split('&')
+                target = postback_data[0]
+                data = postback_data[1]
+
+                #トレンド詳細
+                if target == "trend": 
+                    message = message_creater.create_qiita_trend_items_message_index(index=int(data))
+                    line_message = LineMessage(message)
+                    line_message.reply(reply_token)
+
+            message = event['message']
             user_id = event['source']['userId']
+
+            #ログイン
             if message['text'] == 'login':
                 try:
                     user = User.objects.get(pk=user_id)
@@ -43,9 +57,16 @@ def index(request):
                     line_message = LineMessage(message_creater.create_single_text_message(message))
                     line_message.reply(reply_token)
                 except User.DoesNotExist:
-                    oauth_message = '以下のURLからQiita認証を行なってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                    oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
                     line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
                     line_message.reply(reply_token)
+
+            #トレンド
+            elif message['text'] == 'trend':
+                    message = message_creater.create_qiita_trend_items_message()
+                    line_message = LineMessage(message)
+                    line_message.reply(reply_token)
+
         return HttpResponse("ok")
 
 def login(request, user_id):
