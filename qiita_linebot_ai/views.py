@@ -34,38 +34,60 @@ def index(request):
         events = line_request['events']
         for event in events:
             reply_token = event['replyToken']
+            user_id = event['source']['userId']
             #Postback
             if 'postback' in event:
                 postback_data = event['postback']['data'].split('&')
                 target = postback_data[0]
-                data = postback_data[1]
 
                 #トレンド詳細
-                if target == "trend": 
+                if target == "trend":
+                    data = postback_data[1]
                     message = message_creater.create_qiita_trend_items_message_index(index=int(data))
                     line_message = LineMessage(message)
                     line_message.reply(reply_token)
 
-            message = event['message']
-            user_id = event['source']['userId']
-
-            #ログイン
-            if message['text'] == 'login':
-                try:
-                    user = User.objects.get(pk=user_id)
-                    message = 'すでにログイン済みです！'
-                    line_message = LineMessage(message_creater.create_single_text_message(message))
-                    line_message.reply(reply_token)
-                except User.DoesNotExist:
-                    oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
-                    line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
-                    line_message.reply(reply_token)
-
-            #トレンド
-            elif message['text'] == 'trend':
+                #トレンド
+                elif target == 'alltrend':
                     message = message_creater.create_qiita_trend_items_message()
                     line_message = LineMessage(message)
                     line_message.reply(reply_token)
+
+                #タグ
+                elif target == 'allfollow_tag':
+                    try:
+                        user = User.objects.get(pk=user_id)
+                        message = message_creater.create_tag_index_message(user)
+                        line_message = LineMessage(message)
+                        line_message.reply(reply_token)
+                    except User.DoesNotExist:
+                        oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                        line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
+                        line_message.reply(reply_token)
+
+                #タグトレンド
+                elif target == 'follow_tag_trend':
+                    tag = postback_data[1]
+                    message = message_creater.create_qiita_tag_trend_items_message(tag)
+                    line_message = LineMessage(message)
+                    line_message.reply(reply_token)
+
+                #ログイン
+                elif target == 'login':
+                    try:
+                        user = User.objects.get(pk=user_id)
+                        message = 'すでにログイン済みです！'
+                        line_message = LineMessage(message_creater.create_single_text_message(message))
+                        line_message.reply(reply_token)
+                    except User.DoesNotExist:
+                        oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                        line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
+                        line_message.reply(reply_token)
+
+            else:
+                message = message_creater.create_index_message()
+                line_message = LineMessage(message)
+                line_message.reply(reply_token)
 
         return HttpResponse("ok")
 
