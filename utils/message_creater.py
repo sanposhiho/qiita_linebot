@@ -249,7 +249,7 @@ def create_tag_new_items_message(tag):
                                 "type": "postback",
                                 "label": str(index) +"/5 (詳しく見る)",
                                 "displayText": str(index)+"/5 を詳しく見る",
-                                "data": "tag_item&"+str(index-1)
+                                "data": "tag_item&"+tag+"&"+str(index-1)
                               }
                             }
             contents.append(title_content)
@@ -290,4 +290,16 @@ def create_tag_new_items_message(tag):
             }]
     return message
 
-
+def create_tag_new_items_message_index(tag, index):
+    tag_items = qiita_tools.get_tag_new_items(tag)
+    messages = []
+    for i,tag_item in enumerate(tag_items):
+        if index*5 <= i and i < index*5 + 5:
+            title = tag_item['title'].replace('\u3000', ' ')
+            url = tag_item['url']
+            message = {
+                        'type': 'text',
+                        'text': title + '\n' + url
+                    }
+            messages.append(message)
+    return messages

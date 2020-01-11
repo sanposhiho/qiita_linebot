@@ -79,6 +79,14 @@ def index(request):
                     line_message = LineMessage(message)
                     line_message.reply(reply_token)
 
+                #タグ最新記事
+                elif target == 'tag_item':
+                    tag = postback_data[1]
+                    index = postback_data[2]
+                    message = message_creater.create_tag_new_items_message_index(tag, int(index))
+                    line_message = LineMessage(message)
+                    line_message.reply(reply_token)
+
                 #ログイン
                 elif target == 'login':
                     try:
