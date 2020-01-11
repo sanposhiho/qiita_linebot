@@ -53,3 +53,10 @@ def get_following_tags(user):
         body = res.read()
     following_tags = json.loads(body)
     return following_tags
+
+def get_tag_new_items(tag):
+    req = urllib.request.Request(QIITA_TOP_URL+'/api/v2/tags/'+tag+'/items?page=1&per_page=25')
+    with urllib.request.urlopen(req) as res:
+        body = res.read()
+    items = json.loads(body)
+    return items

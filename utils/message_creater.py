@@ -231,3 +231,63 @@ def create_tag_index_message(user):
                 }
             }]
     return message
+
+def create_tag_new_items_message(tag):
+    tag_items = qiita_tools.get_tag_new_items(tag)
+    contents = []
+    for i,tag_item in enumerate(tag_items):
+        title = tag_item['title'].replace('\u3000', ' ')
+        title_truncated = title[:37] + "..."
+        if (i % 5) == 0:
+            index = i // 5 + 1
+            title_content = {
+                              "type": "button",
+                              "style": "link",
+                              'height': 'sm',
+                              'margin': 'xxl',
+                              "action": {
+                                "type": "postback",
+                                "label": str(index) +"/5 (詳しく見る)",
+                                "displayText": str(index)+"/5 を詳しく見る",
+                                "data": "tag_item&"+str(index-1)
+                              }
+                            }
+            contents.append(title_content)
+        content = {
+                  "type": "button",
+                  "style": "secondary",
+                  'height': 'sm',
+                  'margin': 'xs',
+                  "action": {
+                    "type": "uri",
+                    "label": title_truncated,
+                    "uri": tag_item['url']
+                  }
+                }
+        contents.append(content)
+    message = [{
+                "type": "flex",
+                "altText": tag +"の最新記事はこちらです！",
+                "contents": {
+                "type": "bubble",
+                "header": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": tag +"の最新記事はこちらです！",
+                      }
+                    ]
+                  },
+                "body": {
+                  "type": "box",
+                  "layout": "vertical",
+                  "spacing": "md",
+                  "contents": contents
+                }
+                }
+            }]
+    return message
+
+
