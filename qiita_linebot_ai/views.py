@@ -81,10 +81,15 @@ def index(request):
 
                 #通知
                 elif target == 'notification':
-                    user = User.objects.get(pk=user_id)
-                    message = message_creater.create_auth_user_notifications_message(user)
-                    line_message = LineMessage(message)
-                    line_message.reply(reply_token, user_id)
+                    try:
+                        user = User.objects.get(pk=user_id)
+                        message = message_creater.create_auth_user_notifications_message(user)
+                        line_message = LineMessage(message)
+                        line_message.reply(reply_token, user_id)
+                    except User.DoesNotExist:
+                        oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                        line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
+                        line_message.reply(reply_token, user_id)
 
                 #タグ最新記事
                 elif target == 'tag_item':

@@ -31,12 +31,12 @@ class LineMessage():
                 body = res.read()
         except urllib.error.HTTPError as err:
             print(err)
-            print('pushメッセージを使用して再送します。')
-            body = {
-                'to': user_id,
-                'messages': self.messages
-            }
-            req = urllib.request.Request(REPLY_ENDPOINT_URL, json.dumps(body).encode(), HEADER)
+            #print('pushメッセージを使用して再送します。')
+            #body = {
+            #    'to': user_id,
+            #    'messages': self.messages
+            #}
+            #req = urllib.request.Request(REPLY_ENDPOINT_URL, json.dumps(body).encode(), HEADER)
         except urllib.error.URLError as err:
             print(err.reason)
 
