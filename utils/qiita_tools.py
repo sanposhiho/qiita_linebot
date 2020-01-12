@@ -1,6 +1,8 @@
+import datetime
 import urllib.request
 from bs4 import BeautifulSoup
 import json
+from django.utils import timezone
 
 QIITA_TOP_URL = 'https://qiita.com/'
 
@@ -60,3 +62,53 @@ def get_tag_new_items(tag):
         body = res.read()
     items = json.loads(body)
     return items
+
+def get_auth_user_notifications(user):
+    items = get_auth_user_items(user)
+    notifications = []
+    for item in items:
+        item_id = item['id']
+        notification = check_item_notifications(item_id)
+        notification_with_item_info = {
+                'notifications': notification,
+                'item': item
+                }
+        notifications.append(notification_with_item_info)
+    return notifications
+
+def get_auth_user_items(user):
+    access_token = user.qiita_access_token
+    header = {
+            'Authorization': 'Bearer '+access_token,
+            'content-type'  : 'application/json',
+            }
+    req = urllib.request.Request(QIITA_TOP_URL+'/api/v2/authenticated_user/items?page=1&per_page=5', headers=header)
+    with urllib.request.urlopen(req) as res:
+        body = res.read()
+    items = json.loads(body)
+    return items
+
+def check_item_notifications(item_id):
+    comments = get_item_comments(item_id)
+    comments = list(filter(lambda x: datetime.datetime.strptime(x['created_at'], '%Y-%m-%dT%H:%M:%S%z') >= timezone.now() - datetime.timedelta(days=1), comments))
+    likes = get_item_likes(item_id)
+    likes = list(filter(lambda x: datetime.datetime.strptime(x['created_at'], '%Y-%m-%dT%H:%M:%S%z') >= timezone.now() - datetime.timedelta(days=1), likes))
+    notifications = {
+                    'comments': comments,
+                    'likes': likes
+                    }
+    return notifications
+
+def get_item_comments(item_id):
+    req = urllib.request.Request(QIITA_TOP_URL+'/api/v2/items/'+item_id+'/comments')
+    with urllib.request.urlopen(req) as res:
+        body = res.read()
+    comments = json.loads(body)
+    return comments
+
+def get_item_likes(item_id):
+    req = urllib.request.Request(QIITA_TOP_URL+'/api/v2/items/'+item_id+'/likes')
+    with urllib.request.urlopen(req) as res:
+        body = res.read()
+    likes = json.loads(body)
+    return likes

@@ -45,13 +45,13 @@ def index(request):
                     data = postback_data[1]
                     message = message_creater.create_qiita_trend_items_message_index(index=int(data))
                     line_message = LineMessage(message)
-                    line_message.reply(reply_token)
+                    line_message.reply(reply_token, user_id)
 
                 #トレンド
                 elif target == 'alltrend':
                     message = message_creater.create_qiita_trend_items_message()
                     line_message = LineMessage(message)
-                    line_message.reply(reply_token)
+                    line_message.reply(reply_token, user_id)
 
                 #タグ
                 elif target == 'allfollow_tag':
@@ -59,25 +59,32 @@ def index(request):
                         user = User.objects.get(pk=user_id)
                         message = message_creater.create_tag_index_message(user)
                         line_message = LineMessage(message)
-                        line_message.reply(reply_token)
+                        line_message.reply(reply_token, user_id)
                     except User.DoesNotExist:
                         oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
                         line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
-                        line_message.reply(reply_token)
+                        line_message.reply(reply_token, user_id)
 
                 #タグトレンド
                 elif target == 'follow_tag_trend':
                     tag = postback_data[1]
                     message = message_creater.create_qiita_tag_trend_items_message(tag)
                     line_message = LineMessage(message)
-                    line_message.reply(reply_token)
+                    line_message.reply(reply_token, user_id)
 
-                #タグ最新記事
+                #フォロータグ一覧
                 elif target == 'follow_tag_index':
                     tag = postback_data[1]
                     message = message_creater.create_tag_new_items_message(tag)
                     line_message = LineMessage(message)
-                    line_message.reply(reply_token)
+                    line_message.reply(reply_token, user_id)
+
+                #通知
+                elif target == 'notification':
+                    user = User.objects.get(pk=user_id)
+                    message = message_creater.create_auth_user_notifications_message(user)
+                    line_message = LineMessage(message)
+                    line_message.reply(reply_token, user_id)
 
                 #タグ最新記事
                 elif target == 'tag_item':
@@ -85,7 +92,7 @@ def index(request):
                     index = postback_data[2]
                     message = message_creater.create_tag_new_items_message_index(tag, int(index))
                     line_message = LineMessage(message)
-                    line_message.reply(reply_token)
+                    line_message.reply(reply_token, user_id)
 
                 #ログイン
                 elif target == 'login':
@@ -93,16 +100,16 @@ def index(request):
                         user = User.objects.get(pk=user_id)
                         message = 'すでにログイン済みです！'
                         line_message = LineMessage(message_creater.create_single_text_message(message))
-                        line_message.reply(reply_token)
+                        line_message.reply(reply_token, user_id)
                     except User.DoesNotExist:
                         oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
                         line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
-                        line_message.reply(reply_token)
+                        line_message.reply(reply_token, user_id)
 
             else:
                 message = message_creater.create_index_message()
                 line_message = LineMessage(message)
-                line_message.reply(reply_token)
+                line_message.reply(reply_token, user_id)
 
         return HttpResponse("ok")
 

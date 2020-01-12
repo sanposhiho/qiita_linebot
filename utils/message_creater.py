@@ -34,6 +34,18 @@ def create_index_message():
                 "data": "alltrend"
               }
             }
+    notification = {
+              "type": "button",
+              "style": "primary",
+              'height': 'sm',
+              'margin': 'xl',
+              "action": {
+                "type": "postback",
+                "label": "通知",
+                "displayText": "通知を確認する",
+                "data": "notification"
+              }
+            }
     follow_tag = {
               "type": "button",
               "style": "primary",
@@ -50,6 +62,7 @@ def create_index_message():
     contents.append(login)
     contents.append(trend)
     contents.append(follow_tag)
+    contents.append(notification)
     index_message = [{
                 "type": "flex",
                 "altText": "選択してくださいっ！",
@@ -303,3 +316,83 @@ def create_tag_new_items_message_index(tag, index):
                     }
             messages.append(message)
     return messages
+
+def create_auth_user_notifications_message(user):
+    notification_with_item_info = qiita_tools.get_auth_user_notifications(user)
+    messages = []
+    for notification_info in notification_with_item_info:
+        notification = notification_info['notifications']
+        if notification['comments'] == [] and notification['likes'] == []:
+            continue
+
+        item = notification_info['item']
+        if notification['comments'] == []:
+            comments = "新着のコメントはありません"
+        else:
+            comments = str(len(notification['comments']))+'件の新着のコメントがあります！'
+
+        if notification['likes'] == []:
+            likes = "新着のいいねはありません"
+        else:
+            likes = str(len(notification['likes']))+'件の新着のいいねがあります！'
+
+        message_contents = {
+                  "type": "box",
+                  "layout": "vertical",
+                  "spacing": "md",
+                  "contents":[
+                    {
+                      "type": "text",
+                      "text": comments,
+                      "size": "md",
+                      "align": "start",
+                    },
+                    {
+                      "type": "text",
+                      "text": likes,
+                      "size": "md",
+                      "align": "start",
+                    }
+                  ]
+                }
+        message = {
+                  "type": "box",
+                  "layout": "vertical",
+                  "spacing": "md",
+                  "margin": "xl",
+                  "contents":[
+                    {
+                        "type": "separator"
+                    },
+                    {
+                      "type": "button",
+                      "style": "link",
+                      'height': 'sm',
+                      'margin': 'xs',
+                      "action": {
+                        "type": "uri",
+                        "label": item['title'],
+                        "uri": item['url']
+                      }
+                    },
+                    message_contents
+                  ]
+                }
+        messages.append(message)
+    if messages == []:
+        return_message = create_single_text_message("新着の通知はありません！")
+    else:
+        return_message = [{
+                    "type": "flex",
+                    "altText": "通知一覧です！",
+                    "contents": {
+                    "type": "bubble",
+                    "body": {
+                      "type": "box",
+                      "layout": "vertical",
+                      "spacing": "md",
+                      "contents": messages
+                    }
+                    }
+                }]
+    return return_message
