@@ -25,7 +25,7 @@ LINE_GROUP_URL = settings.LINE_GROUP_URL
 LINE_CHANNEL_ID = settings.LINE_CHANNEL_ID
 LINE_CHANNEL_SECRET = settings.LINE_CHANNEL_SECRET
 
-LINE_REDIRECT_URL = 'https://ecdb2a20.ngrok.io/qiita_linebot_ai/oauth/line/'
+LINE_REDIRECT_URL = 'https://qiitabot.herokuapp.com/qiita_linebot_ai/oauth/line/'
 
 @csrf_exempt
 def index(request):
@@ -61,7 +61,7 @@ def index(request):
                         line_message = LineMessage(message)
                         line_message.reply(reply_token, user_id)
                     except User.DoesNotExist:
-                        oauth_message = 'その前に以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                        oauth_message = '情報の取得のために以下のURLからQiita認証を行ってください！\n' + 'https://qiitabot.herokuapp.com' + reverse("qiita_linebot_ai:login", args=[user_id])
                         line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
                         line_message.reply(reply_token, user_id)
 
@@ -87,7 +87,7 @@ def index(request):
                         line_message = LineMessage(message)
                         line_message.reply(reply_token, user_id)
                     except User.DoesNotExist:
-                        oauth_message = 'その前に以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                        oauth_message = '情報の取得のために以下のURLからQiita認証を行ってください！\n' + 'https://qiitabot.herokuapp.com' + reverse("qiita_linebot_ai:login", args=[user_id])
                         line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
                         line_message.reply(reply_token, user_id)
 
@@ -107,7 +107,7 @@ def index(request):
                         line_message = LineMessage(message_creater.create_single_text_message(message))
                         line_message.reply(reply_token, user_id)
                     except User.DoesNotExist:
-                        oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                        oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://qiitabot.herokuapp.com' + reverse("qiita_linebot_ai:login", args=[user_id])
                         line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
                         line_message.reply(reply_token, user_id)
 
