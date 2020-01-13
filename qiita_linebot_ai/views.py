@@ -61,7 +61,7 @@ def index(request):
                         line_message = LineMessage(message)
                         line_message.reply(reply_token, user_id)
                     except User.DoesNotExist:
-                        oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                        oauth_message = 'その前に以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
                         line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
                         line_message.reply(reply_token, user_id)
 
@@ -87,7 +87,7 @@ def index(request):
                         line_message = LineMessage(message)
                         line_message.reply(reply_token, user_id)
                     except User.DoesNotExist:
-                        oauth_message = '以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
+                        oauth_message = 'その前に以下のURLからQiita認証を行ってください！\n' + 'https://ecdb2a20.ngrok.io' + reverse("qiita_linebot_ai:login", args=[user_id])
                         line_message = LineMessage(message_creater.create_single_text_message(oauth_message))
                         line_message.reply(reply_token, user_id)
 
