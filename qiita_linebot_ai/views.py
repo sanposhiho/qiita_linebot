@@ -82,6 +82,9 @@ def index(request):
                 #通知
                 elif target == 'notification':
                     try:
+                        message = '通知の確認中ですっ...'
+                        line_message = LineMessage(message_creater.create_single_text_message(message))
+                        line_message.push(user_id)
                         user = User.objects.get(pk=user_id)
                         message = message_creater.create_auth_user_notifications_message(user)
                         line_message = LineMessage(message)
