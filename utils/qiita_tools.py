@@ -90,9 +90,7 @@ def get_auth_user_items(user):
 
 def check_item_notifications(item_id):
     comments = get_item_comments(item_id)
-    comments = list(filter(lambda x: datetime.datetime.strptime(x['created_at'], '%Y-%m-%dT%H:%M:%S%z') >= timezone.now() - datetime.timedelta(days=1), comments))
     likes = get_item_likes(item_id)
-    likes = list(filter(lambda x: datetime.datetime.strptime(x['created_at'], '%Y-%m-%dT%H:%M:%S%z') >= timezone.now() - datetime.timedelta(days=1), likes))
     notifications = {
                     'comments': comments,
                     'likes': likes
