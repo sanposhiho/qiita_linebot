@@ -321,9 +321,9 @@ def create_auth_user_notifications_message(user):
     notification_with_item_info = qiita_tools.get_auth_user_notifications(user)
     messages = []
     for notification_info in notification_with_item_info:
+        notification = notification_info['notifications']
         if notification['comments'] == [] and notification['likes'] == []:
             continue
-        notification = notification_info['notifications']
         item = notification_info['item']
         contents = []
         if not notification['comments'] == []:
