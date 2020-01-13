@@ -321,36 +321,38 @@ def create_auth_user_notifications_message(user):
     notification_with_item_info = qiita_tools.get_auth_user_notifications(user)
     messages = []
     for notification_info in notification_with_item_info:
+        if notification['comments'] == [] and notification['likes'] == []:
+            continue
         notification = notification_info['notifications']
         item = notification_info['item']
+        contents = []
         if notification['comments'] == []:
-            comments = "新着のコメントはありません"
         else:
             comments = str(len(notification['comments']))+'件の新着のコメントがあります！'
+            comment_message = {
+                              "type": "text",
+                              "text": comments,
+                              "size": "md",
+                              "align": "start",
+                            }
+            contents.append(comment_message)
 
         if notification['likes'] == []:
-            likes = "新着のいいねはありません"
         else:
             likes = str(len(notification['likes']))+'件の新着のいいねがあります！'
+            like_message = {
+                              "type": "text",
+                              "text": likes,
+                              "size": "md",
+                              "align": "start",
+                            }
+            contents.append(like_message)
 
         message_contents = {
                   "type": "box",
                   "layout": "vertical",
                   "spacing": "md",
-                  "contents":[
-                    {
-                      "type": "text",
-                      "text": comments,
-                      "size": "md",
-                      "align": "start",
-                    },
-                    {
-                      "type": "text",
-                      "text": likes,
-                      "size": "md",
-                      "align": "start",
-                    }
-                  ]
+                  "contents":contents
                 }
         message = {
                   "type": "box",
@@ -376,20 +378,24 @@ def create_auth_user_notifications_message(user):
                   ]
                 }
         messages.append(message)
+    return_messages = []
     if messages == []:
-        return_message = create_single_text_message("新着の通知はありません！")
+        return_messages = create_single_text_message("新着の通知はありません！")
     else:
-        return_message = [{
-                    "type": "flex",
-                    "altText": "通知一覧です！",
-                    "contents": {
-                    "type": "bubble",
-                    "body": {
-                      "type": "box",
-                      "layout": "vertical",
-                      "spacing": "md",
-                      "contents": messages
+        for message in messages:
+            message = [message]
+            return_message = {
+                        "type": "flex",
+                        "altText": "Qiitaの通知です！",
+                        "contents": {
+                        "type": "bubble",
+                        "body": {
+                          "type": "box",
+                          "layout": "vertical",
+                          "spacing": "md",
+                          "contents": message
+                        }
+                        }
                     }
-                    }
-                }]
+            return_messages.append(return_message)
     return return_message
