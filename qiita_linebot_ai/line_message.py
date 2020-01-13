@@ -39,7 +39,7 @@ class LineMessage():
             'to': user_id,
             'messages': self.messages
         }
-        req = urllib.request.Request(REPLY_ENDPOINT_URL, json.dumps(body).encode(), HEADER)
+        req = urllib.request.Request(PUSH_ENDPOINT_URL, json.dumps(body).encode(), HEADER)
         try:
             with urllib.request.urlopen(req) as res:
                 body = res.read()
