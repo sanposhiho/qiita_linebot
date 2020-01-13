@@ -50,7 +50,7 @@ def get_qiita_user_info(user):
 def get_following_tags(user):
     user_info = get_qiita_user_info(user)
     user_id = user_info['id']
-    req = urllib.request.Request(QIITA_TOP_URL+'/api/v2/users/'+user_id+'/following_tags?page=1&per_page=100')
+    req = urllib.request.Request(QIITA_TOP_URL+'/api/v2/users/'+user_id+'/following_tags?page=1&per_page=15')
     with urllib.request.urlopen(req) as res:
         body = res.read()
     following_tags = json.loads(body)
@@ -90,7 +90,9 @@ def get_auth_user_items(user):
 
 def check_item_notifications(item_id):
     comments = get_item_comments(item_id)
+    comments = list(filter(lambda x: datetime.datetime.strptime(x['created_at'], '%Y-%m-%dT%H:%M:%S%z') >= timezone.now() - datetime.timedelta(days=1), comments))
     likes = get_item_likes(item_id)
+    likes = list(filter(lambda x: datetime.datetime.strptime(x['created_at'], '%Y-%m-%dT%H:%M:%S%z') >= timezone.now() - datetime.timedelta(days=1), likes))
     notifications = {
                     'comments': comments,
                     'likes': likes
