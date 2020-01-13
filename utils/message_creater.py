@@ -326,8 +326,7 @@ def create_auth_user_notifications_message(user):
         notification = notification_info['notifications']
         item = notification_info['item']
         contents = []
-        if notification['comments'] == []:
-        else:
+        if not notification['comments'] == []:
             comments = str(len(notification['comments']))+'件の新着のコメントがあります！'
             comment_message = {
                               "type": "text",
@@ -337,8 +336,7 @@ def create_auth_user_notifications_message(user):
                             }
             contents.append(comment_message)
 
-        if notification['likes'] == []:
-        else:
+        if not notification['likes'] == []:
             likes = str(len(notification['likes']))+'件の新着のいいねがあります！'
             like_message = {
                               "type": "text",
@@ -398,4 +396,4 @@ def create_auth_user_notifications_message(user):
                         }
                     }
             return_messages.append(return_message)
-    return return_message
+    return return_messages
