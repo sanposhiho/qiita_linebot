@@ -322,9 +322,6 @@ def create_auth_user_notifications_message(user):
     messages = []
     for notification_info in notification_with_item_info:
         notification = notification_info['notifications']
-        if notification['comments'] == [] and notification['likes'] == []:
-            continue
-
         item = notification_info['item']
         if notification['comments'] == []:
             comments = "新着のコメントはありません"
