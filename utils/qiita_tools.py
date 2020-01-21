@@ -9,10 +9,12 @@ QIITA_TOP_URL = 'https://qiita.com/'
 def get_trend_items(scope):
     if scope == "daily":
         req = urllib.request.Request(QIITA_TOP_URL)
+    #以下は使えない
     elif scope == "monthly":
         req = urllib.request.Request(QIITA_TOP_URL+"?scope=monthly")
     elif scope == "weekly":
         req = urllib.request.Request(QIITA_TOP_URL+"?scope=weekly")
+
     with urllib.request.urlopen(req) as res:
         body = res.read()
     soup = BeautifulSoup(body, "html.parser")

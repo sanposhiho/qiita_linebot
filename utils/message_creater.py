@@ -87,8 +87,9 @@ def create_index_message():
     contents.append(notification)
     contents.append(follow_tag)
     contents.append(trend)
-    contents.append(weekly_trend)
-    contents.append(monthly_trend)
+    #以下は使えない
+    #contents.append(weekly_trend)
+    #contents.append(monthly_trend)
     index_message = [{
                 "type": "flex",
                 "altText": "選択してくださいっ！",
@@ -170,7 +171,7 @@ def create_qiita_trend_items_message(scope):
             }]
     return message
 
-def create_qiita_trend_items_message_index(index, scope="daily"):
+def create_qiita_trend_items_message_index(index, scope):
     trend_items = qiita_tools.get_trend_items(scope)
     messages = []
     for i,trend_item in enumerate(trend_items['trend']['edges']):
