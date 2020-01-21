@@ -31,7 +31,31 @@ def create_index_message():
                 "type": "postback",
                 "label": "トレンド",
                 "displayText": "現在のトレンドを見る",
-                "data": "alltrend"
+                "data": "alltrend&daily"
+              }
+            }
+    weekly_trend = {
+              "type": "button",
+              "style": "primary",
+              'height': 'sm',
+              'margin': 'xl',
+              "action": {
+                "type": "postback",
+                "label": "週間トレンド",
+                "displayText": "週間トレンドを見る",
+                "data": "alltrend&weekly"
+              }
+            }
+    monthly_trend = {
+              "type": "button",
+              "style": "primary",
+              'height': 'sm',
+              'margin': 'xl',
+              "action": {
+                "type": "postback",
+                "label": "月間トレンド",
+                "displayText": "月間トレンドを見る",
+                "data": "alltrend&monthly"
               }
             }
     notification = {
@@ -60,9 +84,11 @@ def create_index_message():
             }
     contents = []
     contents.append(login)
-    contents.append(trend)
-    contents.append(follow_tag)
     contents.append(notification)
+    contents.append(follow_tag)
+    contents.append(trend)
+    contents.append(weekly_trend)
+    contents.append(monthly_trend)
     index_message = [{
                 "type": "flex",
                 "altText": "選択してくださいっ！",
@@ -78,8 +104,8 @@ def create_index_message():
             }]
     return index_message
 
-def create_qiita_trend_items_message():
-    trend_items = qiita_tools.get_trend_items()
+def create_qiita_trend_items_message(scope="daily"):
+    trend_items = qiita_tools.get_trend_items(scope)
     contents = []
     for i,trend_item in enumerate(trend_items['trend']['edges']):
         if i > 24:
@@ -97,7 +123,7 @@ def create_qiita_trend_items_message():
                                 "type": "postback",
                                 "label": "トレンド "+ str(index) +"/5 (詳しく見る)",
                                 "displayText": "トレンド "+str(index)+"/5 を詳しく見る",
-                                "data": "trend&"+str(index-1)
+                                "data": "trend&"+str(index-1)+"&"+scope
                               }
                             }
             contents.append(title_content)
@@ -113,9 +139,15 @@ def create_qiita_trend_items_message():
                   }
                 }
         contents.append(content)
+    if scope == "daily":
+        scope_message = "現在のQiitaのトレンドです！"
+    elif scope == "monthly":
+        scope_message = "現在のQiitaの月間トレンドです！"
+    elif scope == "weekly":
+        scope_message = "現在のQiitaの週間トレンドです！"
     message = [{
                 "type": "flex",
-                "altText": "Qiitaの現在のトレンドの記事はこちらです！",
+                "altText": "トレンドの記事はこちらです！",
                 "contents": {
                 "type": "bubble",
                 "header": {
@@ -124,7 +156,7 @@ def create_qiita_trend_items_message():
                     "contents": [
                       {
                         "type": "text",
-                        "text": "現在のQiitaのトレンドです！"
+                        "text": scope_message
                       }
                     ]
                   },
@@ -138,8 +170,8 @@ def create_qiita_trend_items_message():
             }]
     return message
 
-def create_qiita_trend_items_message_index(index):
-    trend_items = qiita_tools.get_trend_items()
+def create_qiita_trend_items_message_index(index, scope="daily"):
+    trend_items = qiita_tools.get_trend_items(scope)
     messages = []
     for i,trend_item in enumerate(trend_items['trend']['edges']):
         if index*5 <= i and i < index*5 + 5:

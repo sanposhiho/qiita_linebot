@@ -43,13 +43,15 @@ def index(request):
                 #トレンド詳細
                 if target == "trend":
                     data = postback_data[1]
-                    message = message_creater.create_qiita_trend_items_message_index(index=int(data))
+                    scope = postback_data[2]
+                    message = message_creater.create_qiita_trend_items_message_index(index=int(data), scope=scope)
                     line_message = LineMessage(message)
                     line_message.reply(reply_token, user_id)
 
                 #トレンド
                 elif target == 'alltrend':
-                    message = message_creater.create_qiita_trend_items_message()
+                    scope = postback_data[1]
+                    message = message_creater.create_qiita_trend_items_message(scope)
                     line_message = LineMessage(message)
                     line_message.reply(reply_token, user_id)
 
