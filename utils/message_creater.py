@@ -104,7 +104,7 @@ def create_index_message():
             }]
     return index_message
 
-def create_qiita_trend_items_message(scope="daily"):
+def create_qiita_trend_items_message(scope):
     trend_items = qiita_tools.get_trend_items(scope)
     contents = []
     for i,trend_item in enumerate(trend_items['trend']['edges']):

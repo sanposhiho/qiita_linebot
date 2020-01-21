@@ -6,7 +6,7 @@ from django.utils import timezone
 
 QIITA_TOP_URL = 'https://qiita.com/'
 
-def get_trend_items(scope="daily"):
+def get_trend_items(scope):
     if scope == "daily":
         req = urllib.request.Request(QIITA_TOP_URL)
     elif scope == "monthly":
