@@ -19,5 +19,5 @@ Qiitaのアカウントと連携し、自分のフォローなどからQiitaの�
 # Get started
 
 ```
-python manage.py runserver [ipアドレス:ポート番号]
+python manage.py runserver #server起動
 ```
